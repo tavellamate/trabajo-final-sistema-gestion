@@ -1,0 +1,20 @@
+
+# Node modules
+**/node_modules/
+
+# Builds
+**/dist/
+
+# Prisma generated files and cache
+.prisma/
+**/generated/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
