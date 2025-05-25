@@ -1,7 +1,7 @@
 
-# Proyecto Final - IUSNET (App Jurídica)
+# Proyecto Final - LawTrack (App Jurídica)
 
-Este es un proyecto integrador para la materia Desarrollo de Aplicaciones Web. Consiste en una aplicación jurídica inspirada en IUSNET, desarrollada en equipo, con arquitectura cliente-servidor.
+Proyecto de gestión jurídica, gestiona clientes y expedientes en base a un usuario con rol ABOGADO.
 
 ## 🧩 Funcionalidades Principales
 
@@ -26,41 +26,6 @@ Este es un proyecto integrador para la materia Desarrollo de Aplicaciones Web. C
 - **Control de versiones**: Git + GitHub
 
 ---
-
-## 🐘 Configuración de PostgreSQL con Prisma
-
-1. Instalar PostgreSQL y crear una base de datos. Por ejemplo:
-
-```bash
-createdb iusnetdb
-```
-
-2. Editar el archivo `.env` para configurar la URL de conexión:
-
-```
-DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/iusnetdb"
-```
-
-3. Inicializar Prisma:
-
-```bash
-npx prisma init
-```
-
-4. Crear y aplicar migraciones:
-
-```bash
-npx prisma migrate dev --name init
-```
-
-5. Generar el cliente Prisma:
-
-```bash
-npx prisma generate
-```
-
----
-
 ## 🛠️ Uso de Git en el Proyecto
 
 Este proyecto se desarrolla de forma colaborativa utilizando Git y GitHub. Se siguen estas buenas prácticas:
@@ -136,4 +101,4 @@ iusnet/
 
 ## ✅ Créditos
 
-Proyecto realizado por el grupo de [Nombre del curso] - [Nombre de los integrantes] - [Año]
+Proyecto realizado por - [PEÑA, Marcos - TAVELLA, Mateo - BASTIDA, Nicolas] - [2025]
