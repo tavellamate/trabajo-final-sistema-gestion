@@ -18,4 +18,27 @@ router.get('/buscar', async (req, res) => {
   res.json(causas)
 })
 
+router.post('/', async (req, res) => {
+  const { tipo, cliente, resumen } = req.body
+  try {
+    const causa = await prisma.causa.create({
+      data: { tipo, cliente, resumen }
+    })
+    res.status(201).json(causa)
+  } catch (error) {
+    console.error(error) // <--- agrega esto para ver el error en la consola
+    res.status(400).json({ error: 'No se pudo crear la causa', detalle: error })
+  }
+})
+
+router.delete('/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    await prisma.causa.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(400).json({ error: 'No se pudo eliminar la causa' });
+  }
+});
+
 export default router

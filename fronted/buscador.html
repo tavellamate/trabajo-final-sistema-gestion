@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscador y Alta de Causas</title>
+</head>
+<body>
+  <h1>Agregar Causa</h1>
+  <form id="agregar-causa">
+    Tipo: <input type="text" name="tipo" required><br>
+    Cliente: <input type="text" name="cliente" required><br>
+    Resumen: <input type="text" name="resumen" required><br>
+    <button type="submit">Agregar</button>
+  </form>
+  <div id="mensaje"></div>
+  <hr>
+
+  <h1>Buscar Causas</h1>
+  <form id="buscador">
+    Tipo: <input type="text" name="tipo"><br>
+    Cliente: <input type="text" name="cliente"><br>
+    Palabra: <input type="text" name="palabra"><br>
+    <button type="submit">Buscar</button>
+  </form>
+  <br>
+  <table id="tabla" border="1" style="border-collapse:collapse; min-width:400px;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tipo</th>
+        <th>Cliente</th>
+        <th>Resumen</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="5" style="text-align:center;">Sin resultados</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    // Alta de causa
+    document.getElementById('agregar-causa').onsubmit = async function(e) {
+      e.preventDefault();
+      const tipo = this.tipo.value;
+      const cliente = this.cliente.value;
+      const resumen = this.resumen.value;
+      const res = await fetch('http://localhost:3000/api/causas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo, cliente, resumen })
+      });
+      const data = await res.json();
+      const mensaje = document.getElementById('mensaje');
+      if (res.ok) {
+        mensaje.textContent = 'Causa agregada correctamente.';
+        this.reset();
+        document.getElementById('buscador').dispatchEvent(new Event('submit'));
+      } else {
+        mensaje.textContent = 'Error al agregar causa: ' + (data.error || 'Desconocido');
+      }
+      setTimeout(() => mensaje.textContent = '', 3000);
+    };
+
+    // Eliminar causa
+    async function eliminarCausa(id) {
+      if (!confirm('¿Seguro que deseas eliminar esta causa?')) return;
+      const res = await fetch(`http://localhost:3000/api/causas/${id}`, {
+        method: 'DELETE'
+      });
+      const mensaje = document.getElementById('mensaje');
+      if (res.ok) {
+        mensaje.textContent = 'Causa eliminada correctamente.';
+        document.getElementById('buscador').dispatchEvent(new Event('submit'));
+      } else {
+        mensaje.textContent = 'Error al eliminar causa.';
+      }
+      setTimeout(() => mensaje.textContent = '', 3000);
+    }
+
+    // Buscador
+    document.getElementById('buscador').onsubmit = async function(e) {
+      e.preventDefault();
+      const tipo = this.tipo.value;
+      const cliente = this.cliente.value;
+      const palabra = this.palabra.value;
+      const params = new URLSearchParams();
+      if (tipo) params.append('tipo', tipo);
+      if (cliente) params.append('cliente', cliente);
+      if (palabra) params.append('palabra', palabra);
+
+      const res = await fetch('http://localhost:3000/api/causas/buscar?' + params);
+      const data = await res.json();
+
+      const tbody = document.getElementById('tabla').querySelector('tbody');
+      if (data.length) {
+        tbody.innerHTML = data.map(causa => `
+          <tr>
+            <td>${causa.id}</td>
+            <td>${causa.tipo}</td>
+            <td>${causa.cliente}</td>
+            <td>${causa.resumen}</td>
+            <td>
+              <button onclick="eliminarCausa(${causa.id})">Eliminar</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Sin resultados</td></tr>';
+      }
+    };
+
+    // Cargar todas las causas al abrir la página
+    document.getElementById('buscador').dispatchEvent(new Event('submit'));
+    // Hacer la función eliminarCausa global
+    window.eliminarCausa = eliminarCausa;
+  </script>
+</body>
+</html>
