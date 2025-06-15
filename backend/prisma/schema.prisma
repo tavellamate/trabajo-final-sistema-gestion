@@ -62,3 +62,10 @@ model Evento {
   expedienteId Int
   expediente   Expediente @relation(fields: [expedienteId], references: [id])
 }
+
+model Causa {
+  id        Int    @id @default(autoincrement())
+  tipo      String
+  cliente   String
+  resumen   String
+}
