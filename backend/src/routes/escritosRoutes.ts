@@ -1,50 +1,48 @@
-import { Router } from 'express'
-import multer from 'multer'
+// escritosRoutes.ts
+import { Router } from 'express';
+import multer from 'multer';
 import {
   crearEscritoConArchivo,
   listarEscritosPorExpediente,
   obtenerEscritoPorId,
   actualizarEscrito,
-  eliminarEscrito
-} from '../controllers/escritosController'
-// import { autenticarToken } from '../middleware/authMiddleware'
+  eliminarEscrito,
+} from '../controllers/escritosController';
+import { verifyToken as autenticarToken } from '../middleware/authMiddleware';
 
-const router = Router()
-const upload = multer({ dest: 'uploads/' })
+const router = Router();
+const upload = multer({ dest: 'uploads/' });
 
+// Ignoramos verificación de tipos estricta de Express
 router.post(
   '/expedientes/:id/escritos',
-  // autenticarToken,
+  autenticarToken,
   upload.single('archivo'),
-  crearEscritoConArchivo
-)
+  crearEscritoConArchivo as any
+);
 
-// Listar todos los escritos de un expediente
 router.get(
   '/expedientes/:id/escritos',
-  // autenticarToken,
-  listarEscritosPorExpediente
-)
+  autenticarToken,
+  listarEscritosPorExpediente as any
+);
 
-// Obtener un escrito por su ID
 router.get(
   '/escritos/:escritoId',
-  // autenticarToken,
-  obtenerEscritoPorId
-)
+  autenticarToken,
+  obtenerEscritoPorId as any
+);
 
-// Actualizar un escrito
 router.put(
   '/escritos/:escritoId',
-  // autenticarToken,
-  actualizarEscrito
-)
+  autenticarToken,
+  actualizarEscrito as any
+);
 
-// Eliminar un escrito
 router.delete(
   '/escritos/:escritoId',
-  // autenticarToken,
-  eliminarEscrito
-)
+  autenticarToken,
+  eliminarEscrito as any
+);
 
-export default router
+export default router;

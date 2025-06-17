@@ -1,22 +1,27 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
-import authRoutes from './routes/authRoutes'
-import escritosRoutes from './routes/escritosRoutes'
-import causaRoutes from './routes/causaRoutes'
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-dotenv.config()
+import authRoutes from './routes/authRoutes';
+import escritosRoutes from './routes/escritosRoutes';
+import causaRoutes from './routes/causaRoutes';
+import carpetaRoutes from './routes/carpetaRoutes';
 
-const app = express()
+dotenv.config();
 
-app.use(cors())
-app.use(express.json())
-app.use('/api', authRoutes)
-app.use('/api', escritosRoutes)
-app.use('/api/causas', causaRoutes)
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// 🔐 A cada ruta le damos su propio prefijo para que no colisionen
+app.use('/api/auth', authRoutes);           // ⬅️ login, register
+app.use('/api/escritos', escritosRoutes);   // ⬅️ escritos
+app.use('/api/causas', causaRoutes);        // ⬅️ causas
+app.use('/api/carpetas', carpetaRoutes);    // ⬅️ carpetas
 
 app.get('/', (_req, res) => {
-  res.send('LawTrack API funcionando ✅')
-})
+  res.send('LawTrack API funcionando ✅');
+});
 
-export default app
+export default app;

@@ -13,15 +13,27 @@ enum Rol {
 }
 
 model Usuario {
-  id         Int          @id @default(autoincrement())
-  nombre     String
-  email      String       @unique
-  password   String
-  rol        Rol
-  expedientes Expediente[]
-  escritosCreados Escrito[] @relation("UsuarioEscritosCreados")
+  id              Int          @id @default(autoincrement())
+  nombre          String
+  email           String       @unique
+  password        String
+  rol             Rol
+  carpetas        Carpeta[]
+  expedientes     Expediente[]
+  escritosCreados Escrito[]    @relation("UsuarioEscritosCreados")
 }
 
+model Carpeta {
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  numero      Int
+  expediente  String
+  tipoProceso String
+  fechaInicio DateTime
+  fechaFin    DateTime?
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
 
 model Expediente {
   id                    Int       @id @default(autoincrement())
@@ -42,17 +54,16 @@ model Expediente {
 }
 
 model Escrito {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   titulo       String
   descripcion  String?
   archivoUrl   String
   expediente   Expediente @relation(fields: [expedienteId], references: [id])
   expedienteId Int
-  creadoPor    Usuario  @relation("UsuarioEscritosCreados", fields: [creadoPorId], references: [id])
+  creadoPor    Usuario    @relation("UsuarioEscritosCreados", fields: [creadoPorId], references: [id])
   creadoPorId  Int
-  createdAt    DateTime @default(now())
+  createdAt    DateTime   @default(now())
 }
-
 
 model Evento {
   id           Int        @id @default(autoincrement())
@@ -64,8 +75,8 @@ model Evento {
 }
 
 model Causa {
-  id        Int    @id @default(autoincrement())
-  tipo      String
-  cliente   String
-  resumen   String
+  id      Int    @id @default(autoincrement())
+  tipo    String
+  cliente String
+  resumen String
 }
