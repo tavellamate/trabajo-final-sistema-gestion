@@ -48,6 +48,17 @@ const HomePage = () => {
       alert('Error al crear la carpeta');
     }
   };
+      const eliminarCarpeta = async (id: number) => {
+        if (!window.confirm('¿Estás seguro que querés eliminar esta carpeta?')) return;
+
+        try {
+        await api.delete(`/causas/${id}`);
+          setCarpetas(prev => prev.filter(c => c.id !== id));
+        } catch {
+        alert('Error al eliminar la carpeta');
+        }
+};
+
 
   const logout = () => {
     localStorage.clear();
@@ -71,6 +82,9 @@ const HomePage = () => {
             <a href={`/carpeta/${c.id}`}>
               📁{c.tipo} – Cliente: {c.cliente} – {c.resumen}
             </a>
+            <button onClick={() => eliminarCarpeta(c.id)} style={{ marginLeft: '10px' }}>
+              ❌ Eliminar
+            </button>
           </li>
         ))}
       </ul>

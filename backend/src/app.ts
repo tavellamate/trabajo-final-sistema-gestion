@@ -16,7 +16,7 @@ app.use(express.json());
 
 // 🔐 A cada ruta le damos su propio prefijo para que no colisionen
 app.use('/api/auth', authRoutes);           // ⬅️ login, register
-app.use('/api/escritos', escritosRoutes);   // ⬅️ escritos
+app.use('/api/expedientes', escritosRoutes);   // ⬅️ escritos
 app.use('/api/causas', causaRoutes);        // ⬅️ causas
 app.use('/api/carpetas', carpetaRoutes);    // ⬅️ carpetas
 

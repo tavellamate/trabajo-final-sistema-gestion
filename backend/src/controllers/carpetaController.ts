@@ -35,3 +35,29 @@ export const crearCarpeta = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Error al crear carpeta" });
   }
 };
+  export const eliminarCarpeta = async (req: AuthRequest, res: Response) => {
+  const id = Number(req.params.id);
+
+  try {
+    const carpeta = await prisma.carpeta.findUnique({
+      where: { id }
+    });
+
+    // Verificar que la carpeta exista y le pertenezca al usuario
+    //if (!carpeta || carpeta.usuarioId !== req.userId) {
+      //return res.status(403).json({ mensaje: 'No autorizado o carpeta no encontrada' });
+    //}
+      if (!carpeta) {
+        return res.status(404).json({ mensaje: 'Carpeta no encontrada' });
+      }
+
+
+    await prisma.carpeta.delete({
+      where: { id }
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar la carpeta', error });
+  }
+};
