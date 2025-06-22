@@ -5,6 +5,7 @@ import { AuthRequest } from "../middleware/authMiddleware";
 const prisma = new PrismaClient();
 
 export const obtenerCarpetas = async (req: AuthRequest, res: Response) => {
+  console.log("Obteniendo carpetas para userId:", req.userId);
   try {
     const carpetas = await prisma.carpeta.findMany({
       where: { usuarioId: req.userId },
@@ -16,26 +17,59 @@ export const obtenerCarpetas = async (req: AuthRequest, res: Response) => {
 };
 
 export const crearCarpeta = async (req: AuthRequest, res: Response) => {
-  const { nombre, numero, expediente, tipoProceso, fechaInicio, fechaFin } = req.body;
+  const { tipo, nombre, resumen } = req.body;
+
+  // Validación simple
+  if (!tipo || !nombre || !resumen) {
+    return res.status(400).json({ message: "Faltan campos requeridos" });
+  }
 
   try {
+    // Obtener el número incremental por usuario
+    const cantidadCarpetasUsuario = await prisma.carpeta.count({
+      where: { usuarioId: req.userId }
+    });
+    const numero = cantidadCarpetasUsuario + 1;
+    const fechaInicio = new Date();
+
     const carpeta = await prisma.carpeta.create({
       data: {
         nombre,
-        numero: parseInt(numero),
-        expediente,
-        tipoProceso,
-        fechaInicio: new Date(fechaInicio),
-        fechaFin: fechaFin ? new Date(fechaFin) : null,
+        numero,
+        expediente: resumen,
+        tipoProceso: tipo,
+        fechaInicio,
+        fechaFin: null,
         usuarioId: req.userId!,
       },
     });
-    res.status(201).json(carpeta);
-  } catch (error) {
-    res.status(500).json({ message: "Error al crear carpeta" });
+ // Crear expediente asociado
+    const expediente = await prisma.expediente.create({
+      data: {
+        titulo: nombre,
+        numeroCarpeta: String(carpeta.numero),
+        instancia: "", // valor por defecto
+        numeroExpediente: "", // valor por defecto
+        cliente: "", // valor por defecto
+        contrario: "", // valor por defecto
+        tipoProceso: tipo,
+        fechaInicio: carpeta.fechaInicio,
+        fechaUltimoMovimiento: new Date(),
+        estado: "Abierto",
+        usuarioId: req.userId!,
+      },
+    });
+
+    res.status(201).json({ carpeta, expediente });
+  } catch (error: any) {
+    console.error("💥 ERROR al crear carpeta:", error);
+    res.status(500).json({ 
+      message: "Error al crear carpeta", 
+      error: error.message || error 
+    });
   }
 };
-  export const eliminarCarpeta = async (req: AuthRequest, res: Response) => {
+export const eliminarCarpeta = async (req: AuthRequest, res: Response) => {
   const id = Number(req.params.id);
 
   try {
@@ -44,12 +78,10 @@ export const crearCarpeta = async (req: AuthRequest, res: Response) => {
     });
 
     // Verificar que la carpeta exista y le pertenezca al usuario
-    //if (!carpeta || carpeta.usuarioId !== req.userId) {
-      //return res.status(403).json({ mensaje: 'No autorizado o carpeta no encontrada' });
-    //}
-      if (!carpeta) {
-        return res.status(404).json({ mensaje: 'Carpeta no encontrada' });
-      }
+    if (!carpeta || carpeta.usuarioId !== req.userId) {
+      return res.status(403).json({ mensaje: 'No autorizado o carpeta no encontrada' });
+    }
+     
 
 
     await prisma.carpeta.delete({
