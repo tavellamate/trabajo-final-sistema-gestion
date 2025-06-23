@@ -1,50 +1,51 @@
-import { Router } from 'express'
-import multer from 'multer'
+import { Router } from 'express';
+import multer from 'multer';
 import {
   crearEscritoConArchivo,
   listarEscritosPorExpediente,
   obtenerEscritoPorId,
   actualizarEscrito,
-  eliminarEscrito
-} from '../controllers/escritosController'
-// import { autenticarToken } from '../middleware/authMiddleware'
+  eliminarEscrito,
+} from '../controllers/escritosController';
+import { verifyToken as autenticarToken } from '../middleware/authMiddleware';
 
-const router = Router()
-const upload = multer({ dest: 'uploads/' })
+const router = Router();
+const upload = multer({ dest: 'uploads/' });
 
+// 📥 Crear escrito con archivo
 router.post(
-  '/expedientes/:id/escritos',
-  // autenticarToken,
+  '/:expedienteId/escritos',
+  autenticarToken,
   upload.single('archivo'),
-  crearEscritoConArchivo
-)
+  crearEscritoConArchivo as any
+);
 
-// Listar todos los escritos de un expediente
+// 📄 Obtener escritos por expediente
 router.get(
-  '/expedientes/:id/escritos',
-  // autenticarToken,
-  listarEscritosPorExpediente
-)
+  '/:expedienteId/escritos',
+  autenticarToken,
+  listarEscritosPorExpediente as any
+);
 
-// Obtener un escrito por su ID
+// 🔎 Obtener un escrito puntual
 router.get(
   '/escritos/:escritoId',
-  // autenticarToken,
-  obtenerEscritoPorId
-)
+  autenticarToken,
+  obtenerEscritoPorId as any
+);
 
-// Actualizar un escrito
+// ✏️ Actualizar escrito
 router.put(
   '/escritos/:escritoId',
-  // autenticarToken,
-  actualizarEscrito
-)
+  autenticarToken,
+  actualizarEscrito as any
+);
 
-// Eliminar un escrito
+// 🗑️ Eliminar escrito
 router.delete(
   '/escritos/:escritoId',
-  // autenticarToken,
-  eliminarEscrito
-)
+  autenticarToken,
+  eliminarEscrito as any
+);
 
-export default router
+export default router;
