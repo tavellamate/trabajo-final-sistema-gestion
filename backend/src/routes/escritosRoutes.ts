@@ -1,51 +1,34 @@
-import { Router } from 'express';
-import multer from 'multer';
+import { Router } from "express";
 import {
   crearEscritoConArchivo,
   listarEscritosPorExpediente,
   obtenerEscritoPorId,
   actualizarEscrito,
   eliminarEscrito,
-} from '../controllers/escritosController';
-import { verifyToken as autenticarToken } from '../middleware/authMiddleware';
+} from "../controllers/escritosController";
+import { verifyToken } from "../middleware/authMiddleware";
+import multer from "multer";
+import path from "path";
 
 const router = Router();
-const upload = multer({ dest: 'uploads/' });
 
-// 📥 Crear escrito con archivo
-router.post(
-  '/:expedienteId/escritos',
-  autenticarToken,
-  upload.single('archivo'),
-  crearEscritoConArchivo as any
-);
+// Configuración personalizada de multer para guardar con nombre original + timestamp
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
+    cb(null, `${base}-${Date.now()}${ext}`);
+  }
+});
+const upload = multer({ storage });
 
-// 📄 Obtener escritos por expediente
-router.get(
-  '/:expedienteId/escritos',
-  autenticarToken,
-  listarEscritosPorExpediente as any
-);
-
-// 🔎 Obtener un escrito puntual
-router.get(
-  '/escritos/:escritoId',
-  autenticarToken,
-  obtenerEscritoPorId as any
-);
-
-// ✏️ Actualizar escrito
-router.put(
-  '/escritos/:escritoId',
-  autenticarToken,
-  actualizarEscrito as any
-);
-
-// 🗑️ Eliminar escrito
-router.delete(
-  '/escritos/:escritoId',
-  autenticarToken,
-  eliminarEscrito as any
-);
+router.get("/:id/escritos", verifyToken, listarEscritosPorExpediente);
+router.post("/:id/escritos", verifyToken, upload.single("archivo"), crearEscritoConArchivo);
+router.get("/escritos/:escritoId", verifyToken, obtenerEscritoPorId);
+router.put("/escritos/:escritoId", verifyToken, actualizarEscrito);
+router.delete("/escritos/:escritoId", verifyToken, eliminarEscrito);
 
 export default router;

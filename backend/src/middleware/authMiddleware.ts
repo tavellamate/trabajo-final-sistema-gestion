@@ -14,6 +14,7 @@ declare module 'express-serve-static-core' {
 
 // ✅ Middleware que verifica el token JWT
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
+  console.log("verifyToken ejecutado");
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

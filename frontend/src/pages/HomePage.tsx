@@ -3,9 +3,9 @@ import api from '../services/api';
 
 interface Carpeta {
   id: number;
-  tipo: string;
-  cliente: string;
-  resumen: string;
+  nombre: string;
+  tipoProceso: string;
+  expediente: string;
 }
 
 const HomePage = () => {
@@ -16,49 +16,48 @@ const HomePage = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-  if (!token) {
-    window.location.href = '/';
-    return;
-  }
+    if (!token) {
+      window.location.href = '/';
+      return;
+    }
 
-  api.get('/causas/buscar')
-    .then(res => setCarpetas(res.data))
-    .catch(err => {
-      console.error('Error al cargar causas:', err);
-      alert('Error al cargar las carpetas');
-    });
-}, []);
-
+    api.get('/carpetas')
+      .then(res => setCarpetas(res.data))
+      .catch(err => {
+        console.error('Error al cargar carpetas:', err);
+        alert('Error al cargar las carpetas');
+      });
+  }, [token]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const crearCarpeta = async () => {
-    try {
-      const res = await api.post<Carpeta>('/causas', {
-        tipo: form.tipo,
-        cliente: form.nombre,
-        resumen: form.resumen,
-      });
-
-      setCarpetas((prev: Carpeta[]) => [...prev, res.data]); // ✅ TIPADO CORRECTO
-      setForm({ tipo: '', nombre: '', resumen: '' }); // Limpiar inputs
-    } catch {
-      alert('Error al crear la carpeta');
-    }
-  };
-      const eliminarCarpeta = async (id: number) => {
-        if (!window.confirm('¿Estás seguro que querés eliminar esta carpeta?')) return;
-
-        try {
-        await api.delete(`/causas/${id}`);
-          setCarpetas(prev => prev.filter(c => c.id !== id));
-        } catch {
-        alert('Error al eliminar la carpeta');
-        }
+  try {
+    await api.post('/carpetas', {
+      tipo: form.tipo,
+      nombre: form.nombre,
+      resumen: form.resumen
+    });
+    setForm({ tipo: '', nombre: '', resumen: '' });
+    // Refresca el listado
+    api.get('/carpetas')
+      .then(res => setCarpetas(res.data));
+  } catch {
+    alert('Error al crear la carpeta');
+  }
 };
 
+  const eliminarCarpeta = async (id: number) => {
+    if (!window.confirm('¿Estás seguro que querés eliminar esta carpeta?')) return;
+    try {
+      await api.delete(`/carpetas/${id}`);
+      setCarpetas(prev => prev.filter(c => c.id !== id));
+    } catch {
+      alert('Error al eliminar la carpeta');
+    }
+  };
 
   const logout = () => {
     localStorage.clear();
@@ -80,7 +79,7 @@ const HomePage = () => {
         {carpetas.map((c) => (
           <li key={c.id}>
             <a href={`/carpeta/${c.id}`}>
-              📁{c.tipo} – Cliente: {c.cliente} – {c.resumen}
+              📁{c.tipoProceso} – Cliente: {c.nombre} – {c.expediente}
             </a>
             <button onClick={() => eliminarCarpeta(c.id)} style={{ marginLeft: '10px' }}>
               ❌ Eliminar
